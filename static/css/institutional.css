@@ -1,0 +1,395 @@
+/* ==========================================================================
+   FCyT UNCA - Sistema Institucional de Egresados y Analítica
+   Sistema de Diseño: Institucional Moderno / Restrained
+   ========================================================================== */
+
+:root {
+    /* Paleta Institucional (sin negros puros) */
+    --color-bg-canvas: #f8fafc;        /* Slate muy suave */
+    --color-surface: #ffffff;
+    --color-surface-subtle: #f1f5f9;
+    --color-surface-hover: #e2e8f0;
+
+    --color-navy-dark: #0f2744;        /* Azul institucional profundo */
+    --color-navy: #163e6e;             /* Primario de marca */
+    --color-navy-light: #2563eb;       /* Azul interactivo */
+    --color-navy-tint: #eff6ff;        /* Fondo claro azulado */
+
+    --color-amber: #d97706;            /* Acento ámbar institucional */
+    --color-amber-tint: #fef3c7;
+    
+    --color-text-main: #1e293b;        /* Slate 800 - contraste alto legible */
+    --color-text-muted: #64748b;       /* Slate 500 */
+    --color-text-dim: #94a3b8;         /* Slate 400 */
+    --color-border: #e2e8f0;           /* Borde sutil */
+    --color-border-subtle: #cbd5e1;
+
+    --color-success: #059669;
+    --color-success-bg: #ecfdf5;
+    --color-info: #0284c7;
+    --color-info-bg: #f0f9ff;
+    --color-danger: #dc2626;
+    --color-danger-bg: #fef2f2;
+
+    /* Tipografías */
+    --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Radios y Espaciados */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+
+    /* Sombras atmosféricas suaves con offset (nunca halos saturados) */
+    --shadow-subtle: 0 1px 3px rgba(15, 39, 68, 0.04), 0 1px 2px rgba(15, 39, 68, 0.03);
+    --shadow-card: 0 4px 6px -1px rgba(15, 39, 68, 0.05), 0 2px 4px -2px rgba(15, 39, 68, 0.03);
+    --shadow-float: 0 10px 15px -3px rgba(15, 39, 68, 0.07), 0 4px 6px -4px rgba(15, 39, 68, 0.04);
+}
+
+/* Base & Reset Ergonomía */
+html, body {
+    background-color: var(--color-bg-canvas);
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografía de Encabezados */
+h1, h2, h3, h4, h5, h6, .display-heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+}
+
+/* Selección y Focus States */
+::selection {
+    background-color: rgba(37, 99, 235, 0.15);
+    color: var(--color-navy-dark);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-navy-light);
+    outline-offset: 2px;
+}
+
+/* Navbar Institucional */
+.navbar-institutional {
+    background-color: var(--color-navy-dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+}
+
+.navbar-institutional .brand-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+.navbar-institutional .brand-subtitle {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: block;
+    line-height: 1.1;
+}
+
+.navbar-institutional .nav-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-sm);
+    transition: all 180ms ease;
+}
+
+.navbar-institutional .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-institutional .nav-link.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.14);
+    font-weight: 600;
+}
+
+/* Encabezados de Sección Abiertos (Sin enmarcar en cajas rígidas) */
+.section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.section-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.35rem;
+}
+
+.section-description {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 0;
+    max-width: 75ch;
+}
+
+/* Contenedores de Superficie Limpia */
+.surface-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-subtle);
+}
+
+/* Métricas Clave (Visual Data Blocks abiertos y generosos) */
+.metric-block {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.metric-value {
+    font-family: var(--font-heading);
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--color-navy-dark);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.metric-footer {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Módulo de Gráficos (Espaciado amplio y legibilidad) */
+.chart-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-subtle);
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-surface-subtle);
+}
+
+.chart-panel-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-navy-dark);
+    margin: 0;
+}
+
+.chart-panel-subtitle {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* Tablas Institucionales de Alta Densidad y Máxima Legibilidad */
+.table-institutional {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-institutional thead th {
+    background-color: #f8fafc;
+    color: var(--color-text-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    border-top: none;
+    white-space: nowrap;
+}
+
+.table-institutional tbody td {
+    padding: 0.9rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-main);
+    font-size: 0.88rem;
+    background-color: var(--color-surface);
+    transition: background-color 140ms ease;
+}
+
+.table-institutional tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table-institutional tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Botones con estilo propio y sin excesos */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    line-height: 1.4;
+}
+
+.btn i {
+    font-size: 1.05em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-sm {
+    gap: 0.4rem;
+}
+
+.btn-sm i {
+    font-size: 1em;
+}
+
+.badge-subtle {
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.3em 0.65em;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.badge-subtle i {
+    font-size: 1em;
+    line-height: 1;
+}
+
+.badge-subtle-primary {
+    background-color: var(--color-navy-tint);
+    color: var(--color-navy);
+}
+
+.badge-subtle-success {
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.badge-subtle-info {
+    background-color: var(--color-info-bg);
+    color: var(--color-info);
+}
+
+.badge-subtle-neutral {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-muted);
+}
+
+.btn-institutional-primary {
+    background-color: var(--color-navy);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-navy);
+    transition: all 160ms ease;
+}
+
+.btn-institutional-primary:hover, .btn-institutional-primary:focus {
+    background-color: var(--color-navy-dark);
+    border-color: var(--color-navy-dark);
+    color: #ffffff;
+}
+
+.btn-institutional-secondary {
+    background-color: transparent;
+    color: var(--color-navy);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-subtle);
+    transition: all 160ms ease;
+}
+
+.btn-institutional-secondary:hover {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-navy-dark);
+}
+
+/* Formularios y Filtros */
+.form-label-institutional {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-navy-dark);
+    margin-bottom: 0.35rem;
+}
+
+.form-control-institutional, .form-select-institutional {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.88rem;
+    color: var(--color-text-main);
+    background-color: #ffffff;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.form-control-institutional:focus, .form-select-institutional:focus {
+    border-color: var(--color-navy-light);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    outline: none;
+}
+
+/* Barra de progreso de cohortes limpia */
+.progress-retention {
+    height: 8px;
+    background-color: var(--color-surface-subtle);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-retention .progress-bar {
+    background-color: var(--color-navy);
+    border-radius: 999px;
+}

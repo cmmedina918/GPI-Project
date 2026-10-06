@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Banco de Graduados y Egresados | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1 class="section-title">Banco Oficial de Graduados</h1>
+        <p class="section-description">
+            Padrón histórico y reciente de egresados de la Facultad de Ciencias y Tecnologías.
+            <span class="badge-subtle badge-subtle-neutral ms-1">{{ total_registros }} egresados registrados</span>
+        </p>
+    </div>
+    <div>
+        <a href="{% url 'egresados:crear' %}" class="btn btn-institutional-primary shadow-sm">
+            <i class="bi bi-person-plus"></i>
+            <span>Registrar Nuevo Egresado</span>
+        </a>
+    </div>
+</div>
+
+<!-- Filtros de Consulta Rápida -->
+<div class="surface-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-lg-4 col-md-6">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control form-control-institutional border-start-0" placeholder="Buscar por Nombre, CIN, N° o Ciudad..." value="{{ query }}">
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <select name="carrera" class="form-select form-select-institutional form-select-sm">
+                <option value="">Todas las Carreras</option>
+                {% for c in carreras %}
+                    <option value="{{ c.id }}" {% if carrera_id == c.id|stringformat:"i" %}selected{% endif %}>{{ c.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <select name="sexo" class="form-select form-select-institutional form-select-sm">
+                <option value="">Cualquier Sexo</option>
+                <option value="M" {% if sexo == 'M' %}selected{% endif %}>Masculino</option>
+                <option value="F" {% if sexo == 'F' %}selected{% endif %}>Femenino</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <select name="anio_egreso" class="form-select form-select-institutional form-select-sm">
+                <option value="">Año de Graduación</option>
+                {% for anio in anios_egreso %}
+                    <option value="{{ anio }}" {% if anio_egreso == anio|stringformat:"i" %}selected{% endif %}>{{ anio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-1 col-md-4 d-flex gap-1">
+            <button type="submit" class="btn btn-institutional-primary btn-sm w-100">Filtrar</button>
+            {% if query or carrera_id or sexo or anio_egreso %}
+                <a href="{% url 'egresados:lista' %}" class="btn btn-institutional-secondary btn-sm" title="Limpiar"><i class="bi bi-x"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Tabla Principal de Egresados -->
+<div class="surface-panel overflow-hidden">
+    <div class="table-responsive">
+        <table class="table-institutional">
+            <thead>
+                <tr>
+                    <th class="ps-4" style="width: 80px;">N°</th>
+                    <th>Egresado</th>
+                    <th>Cédula (CIN)</th>
+                    <th>Programa Académico</th>
+                    <th class="text-center">Sexo</th>
+                    <th class="text-center">Cursado</th>
+                    <th class="text-center">Permanencia</th>
+                    <th>Origen</th>
+                    <th class="text-center">Tesis</th>
+                    <th class="text-end pe-4" style="width: 100px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eg in page_obj %}
+                    <tr>
+                        <td class="ps-4 font-monospace fw-bold text-muted" style="font-size: 0.8rem;">
+                            #{{ eg.numero_egresado }}
+                        </td>
+                        <td>
+                            <a href="{% url 'egresados:detalle' eg.numero_egresado %}" class="fw-bold text-decoration-none text-dark d-block">
+                                {{ eg.apellidos }}, {{ eg.nombres }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="font-monospace text-muted" style="font-size: 0.82rem;">{{ eg.cin }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-medium text-secondary" style="font-size: 0.85rem;">{{ eg.carrera.nombre }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if eg.sexo == 'M' %}
+                                <span class="badge-subtle badge-subtle-primary">M</span>
+                            {% else %}
+                                <span class="badge-subtle badge-subtle-neutral text-danger">F</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center font-monospace small">
+                            {{ eg.anio_ingreso }} &rarr; <strong>{{ eg.anio_egreso }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge-subtle badge-subtle-neutral font-monospace">
+                                {{ eg.duracion_carrera }} años
+                            </span>
+                        </td>
+                        <td>
+                            <span class="text-muted small">{{ eg.lugar_nacimiento }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if eg.link_repositorio %}
+                                <a href="{{ eg.link_repositorio }}" target="_blank" class="text-primary text-decoration-none" title="Repositorio Institucional (Tesis / PFG)">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            {% else %}
+                                <span class="text-muted opacity-50">&mdash;</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'egresados:editar' eg.numero_egresado %}" class="btn btn-sm btn-link text-muted p-1" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center py-5 text-muted">
+                            No se encontraron egresados con los criterios de búsqueda indicados.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación Discreta -->
+    {% if page_obj.has_other_pages %}
+        <div class="px-4 py-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-light">
+            <span class="text-muted small">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} (Mostrando 20 registros por página)
+            </span>
+            <nav>
+                <ul class="pagination pagination-sm mb-0 gap-1">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link border-0 text-muted" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">&laquo; Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link border rounded text-dark" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link border rounded text-dark" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link border-0 text-muted" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Última &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

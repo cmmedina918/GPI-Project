@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Carreras | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1 class="section-title">Programas Académicos</h1>
+        <p class="section-description">
+            Catálogo oficial de carreras de grado ofrecidas por la Facultad de Ciencias y Tecnologías.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Tabla de Carreras Existentes -->
+    <div class="col-lg-7">
+        <div class="surface-panel overflow-hidden">
+            <div class="px-4 py-3 border-bottom d-flex justify-content-between align-items-center" style="background-color: #fafbfc;">
+                <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.05em;">Carreras Disponibles</span>
+                <span class="badge-subtle badge-subtle-primary font-monospace">{{ carreras.count }} activas</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table-institutional">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Nombre de la Carrera</th>
+                            <th class="text-center">Duración</th>
+                            <th class="text-center">Egresados</th>
+                            <th class="text-end pe-4">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in carreras %}
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">
+                                    {{ c.nombre }}
+                                </td>
+                                <td class="text-center font-monospace">{{ c.duracion_teorica }} años</td>
+                                <td class="text-center">
+                                    <span class="badge-subtle badge-subtle-primary font-monospace">
+                                        {{ c.egresados.count }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if c.activa %}
+                                        <span class="badge-subtle badge-subtle-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge-subtle badge-subtle-neutral">Inactiva</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No existen carreras registradas en el catálogo.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario para Nueva Carrera -->
+    <div class="col-lg-5">
+        <div class="surface-panel p-4">
+            <span class="text-uppercase fw-bold text-muted small d-block mb-3" style="letter-spacing: 0.05em;">Alta de Carrera</span>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label-institutional">Denominación del Programa</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                        <div class="text-danger small mt-1">{{ form.nombre.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-institutional">Duración Teórica (Años)</label>
+                    {{ form.duracion_teorica }}
+                    {% if form.duracion_teorica.errors %}
+                        <div class="text-danger small mt-1">{{ form.duracion_teorica.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-check mb-4">
+                    {{ form.activa }}
+                    <label class="form-check-label small fw-semibold text-secondary" for="{{ form.activa.id_for_label }}">
+                        Programa Académico Activo
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-institutional-primary w-100">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Registrar Carrera</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

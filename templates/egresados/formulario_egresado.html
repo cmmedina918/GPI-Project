@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-9 col-lg-10">
+        <div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div>
+                <h1 class="section-title">{{ titulo }}</h1>
+                <p class="section-description">
+                    Complete la ficha técnica del graduado asegurando la consistencia entre año de ingreso y culminación.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'egresados:lista' %}" class="btn btn-institutional-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Regresar al Banco</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="surface-panel p-4 p-md-5">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mb-4 py-2 px-3 small">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Bloque 1: Identificación -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <span class="text-uppercase fw-bold text-muted small d-block mb-3" style="letter-spacing: 0.05em;">1. Identificación y Documento</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label-institutional">N° de Registro</label>
+                            {{ form.numero_egresado }}
+                            {% if form.numero_egresado.errors %}
+                                <div class="text-danger small mt-1">{{ form.numero_egresado.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-institutional">Cédula de Identidad (CIN)</label>
+                            {{ form.cin }}
+                            {% if form.cin.errors %}
+                                <div class="text-danger small mt-1">{{ form.cin.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-institutional">Sexo</label>
+                            {{ form.sexo }}
+                            {% if form.sexo.errors %}
+                                <div class="text-danger small mt-1">{{ form.sexo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-institutional">Nombres</label>
+                            {{ form.nombres }}
+                            {% if form.nombres.errors %}
+                                <div class="text-danger small mt-1">{{ form.nombres.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-institutional">Apellidos</label>
+                            {{ form.apellidos }}
+                            {% if form.apellidos.errors %}
+                                <div class="text-danger small mt-1">{{ form.apellidos.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bloque 2: Datos Académicos -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <span class="text-uppercase fw-bold text-muted small d-block mb-3" style="letter-spacing: 0.05em;">2. Trayectoria Académica</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-institutional">Carrera</label>
+                            {{ form.carrera }}
+                            {% if form.carrera.errors %}
+                                <div class="text-danger small mt-1">{{ form.carrera.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-institutional">Año de Ingreso</label>
+                            {{ form.anio_ingreso }}
+                            {% if form.anio_ingreso.errors %}
+                                <div class="text-danger small mt-1">{{ form.anio_ingreso.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-institutional">Año de Graduación</label>
+                            {{ form.anio_egreso }}
+                            {% if form.anio_egreso.errors %}
+                                <div class="text-danger small mt-1">{{ form.anio_egreso.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-institutional">Enlace a Repositorio Institucional (Tesis / PFG)</label>
+                            {{ form.link_repositorio }}
+                            <div class="form-text small text-muted">URL hacia la publicación digital en el repositorio DSpace de la FCyT.</div>
+                            {% if form.link_repositorio.errors %}
+                                <div class="text-danger small mt-1">{{ form.link_repositorio.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bloque 3: Datos de Nacimiento -->
+                <div class="mb-4">
+                    <span class="text-uppercase fw-bold text-muted small d-block mb-3" style="letter-spacing: 0.05em;">3. Procedencia</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-institutional">Lugar de Nacimiento (Ciudad / Depto.)</label>
+                            {{ form.lugar_nacimiento }}
+                            {% if form.lugar_nacimiento.errors %}
+                                <div class="text-danger small mt-1">{{ form.lugar_nacimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-institutional">Fecha de Nacimiento</label>
+                            {{ form.fecha_nacimiento }}
+                            {% if form.fecha_nacimiento.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_nacimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a href="{% url 'egresados:lista' %}" class="btn btn-institutional-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-institutional-primary px-4">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Guardar Información</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

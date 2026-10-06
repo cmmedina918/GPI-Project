@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Egresado #{{ egresado.numero_egresado }} | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge-subtle badge-subtle-primary font-monospace">Registro Oficial #{{ egresado.numero_egresado }}</span>
+            <span class="text-muted small">&bull;</span>
+            <span class="text-muted small">{{ egresado.carrera.nombre }}</span>
+        </div>
+        <h1 class="section-title mb-0">{{ egresado.nombres }} {{ egresado.apellidos }}</h1>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'egresados:editar' egresado.numero_egresado %}" class="btn btn-institutional-primary btn-sm">
+            <i class="bi bi-pencil"></i>
+            <span>Modificar Datos</span>
+        </a>
+        <a href="{% url 'egresados:lista' %}" class="btn btn-institutional-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver al Listado</span>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Ficha Académica y Personal Abierta -->
+    <div class="col-lg-8">
+        <div class="surface-panel p-4 mb-4">
+            <h4 class="fw-bold mb-4" style="color: var(--color-navy-dark); font-size: 1.1rem; border-bottom: 1px solid var(--color-surface-subtle); padding-bottom: 0.75rem;">
+                Datos Académicos y de Graduación
+            </h4>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Carrera / Programa</span>
+                    <span class="fw-bold text-dark fs-5">{{ egresado.carrera.nombre }}</span>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Cédula de Identidad (CIN)</span>
+                    <span class="font-monospace fs-5 text-dark fw-bold">{{ egresado.cin }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Año de Ingreso</span>
+                    <span class="font-monospace fs-4 text-dark fw-bold">{{ egresado.anio_ingreso }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Año de Graduación</span>
+                    <span class="font-monospace fs-4 text-success fw-bold">{{ egresado.anio_egreso }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Tiempo de Permanencia</span>
+                    <span class="font-monospace fs-4 text-primary fw-bold">{{ egresado.duracion_carrera }} años</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="surface-panel p-4">
+            <h4 class="fw-bold mb-4" style="color: var(--color-navy-dark); font-size: 1.1rem; border-bottom: 1px solid var(--color-surface-subtle); padding-bottom: 0.75rem;">
+                Información Demográfica
+            </h4>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Sexo</span>
+                    <span class="fw-semibold text-dark">{{ egresado.get_sexo_display }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Lugar de Nacimiento</span>
+                    <span class="fw-semibold text-dark">{{ egresado.lugar_nacimiento }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Fecha de Nacimiento</span>
+                    {% if egresado.fecha_nacimiento %}
+                        <span class="fw-semibold text-dark">{{ egresado.fecha_nacimiento|date:"d/m/Y" }}</span>
+                        <span class="text-muted small d-block">Edad al egreso: {{ egresado.edad_egreso }} años</span>
+                    {% else %}
+                        <span class="text-muted">No consignada</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna Lateral: Repositorio e Información Legal -->
+    <div class="col-lg-4">
+        <div class="surface-panel p-4 mb-4">
+            <span class="text-muted small d-block mb-2 text-uppercase fw-semibold" style="letter-spacing: 0.05em;">Producción Académica</span>
+            <h5 class="fw-bold mb-3" style="color: var(--color-navy-dark);">Tesis / Proyecto Final</h5>
+            {% if egresado.link_repositorio %}
+                <p class="text-muted small mb-3">
+                    El documento de graduación se encuentra indexado en el repositorio digital institucional.
+                </p>
+                <a href="{{ egresado.link_repositorio }}" target="_blank" class="btn btn-institutional-primary w-100 d-flex justify-content-center align-items-center gap-2">
+                    <span>Acceder a Publicación</span>
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+            {% else %}
+                <p class="text-muted small mb-0 fst-italic">
+                    No se ha vinculado aún un enlace al repositorio para este registro.
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="p-3 bg-white bg-opacity-50 border rounded-3 text-muted small">
+            <div class="d-flex align-items-center gap-2 mb-1 fw-bold text-secondary">
+                <i class="bi bi-shield-check"></i>
+                <span>Protección de Datos</span>
+            </div>
+            <span>Registro archivado conforme a la Ley N° 7593/2025 para fines estrictamente académicos e institucionales.</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

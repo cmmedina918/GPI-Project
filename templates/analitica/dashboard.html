@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+
+{% block title %}Tablero Analítico Institucional | FCyT UNCA{% endblock %}
+
+{% block content %}
+<!-- Cabecera de Sección Despejada -->
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1 class="section-title">Analítica Institucional de Egresados</h1>
+        <p class="section-description">
+            Monitoreo multidimensional del rendimiento académico, cohortes y distribución geográfica del cuerpo de graduados de la facultad.
+        </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-institutional-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosPanel">
+            <i class="bi bi-sliders2"></i>
+            <span>Filtros</span>
+            {% if filtros %}
+                <span class="badge rounded-pill bg-primary ms-1" style="font-size: 0.75rem;">Activos</span>
+            {% endif %}
+        </button>
+        {% if filtros %}
+            <a href="{% url 'analitica:dashboard' %}" class="btn btn-sm btn-link text-muted text-decoration-none" title="Limpiar todos los filtros">
+                <i class="bi bi-x-circle"></i>
+                <span>Limpiar</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Panel de Filtros Multidimensionales Desplegable -->
+<div class="collapse {% if filtros %}show{% endif %} mb-4" id="filtrosPanel">
+    <div class="surface-panel p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.05em;">Criterios de Exploración Multidimensional</span>
+            <span class="text-muted small">Afecta simultáneamente las métricas y gráficos</span>
+        </div>
+        <form method="get" class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label-institutional">Carrera</label>
+                <select name="carrera" class="form-select form-select-institutional">
+                    <option value="">Todas las carreras</option>
+                    {% for c in carreras %}
+                        <option value="{{ c.id }}" {% if filtros.carrera_id == c.id %}selected{% endif %}>
+                            {{ c.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label-institutional">Sexo</label>
+                <select name="sexo" class="form-select form-select-institutional">
+                    <option value="">Ambos sexos</option>
+                    <option value="M" {% if filtros.sexo == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="F" {% if filtros.sexo == 'F' %}selected{% endif %}>Femenino</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label-institutional">Período de Ingreso</label>
+                <div class="input-group input-group-sm">
+                    <input type="number" name="anio_ingreso_desde" class="form-control form-control-institutional" placeholder="Desde" value="{{ filtros.anio_ingreso_desde|default:'' }}">
+                    <span class="input-group-text bg-white border-start-0 border-end-0 text-muted">&ndash;</span>
+                    <input type="number" name="anio_ingreso_hasta" class="form-control form-control-institutional" placeholder="Hasta" value="{{ filtros.anio_ingreso_hasta|default:'' }}">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label-institutional">Período de Egreso</label>
+                <div class="input-group input-group-sm">
+                    <input type="number" name="anio_egreso_desde" class="form-control form-control-institutional" placeholder="Desde" value="{{ filtros.anio_egreso_desde|default:'' }}">
+                    <span class="input-group-text bg-white border-start-0 border-end-0 text-muted">&ndash;</span>
+                    <input type="number" name="anio_egreso_hasta" class="form-control form-control-institutional" placeholder="Hasta" value="{{ filtros.anio_egreso_hasta|default:'' }}">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-institutional-primary w-100">
+                    <i class="bi bi-filter"></i>
+                    <span>Filtrar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bloques de Métricas Principales (Formato abierto sin tarjetas duras) -->
+<div class="row g-3 mb-5">
+    <div class="col-xl-3 col-sm-6">
+        <div class="metric-block">
+            <span class="metric-label">Total de Egresados</span>
+            <div class="metric-value">{{ indicadores.total_egresados }}</div>
+            <div class="metric-footer">
+                <i class="bi bi-people text-primary"></i>
+                <span>Registros consolidados</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="metric-block">
+            <span class="metric-label">Permanencia Promedio</span>
+            <div class="metric-value">{{ indicadores.promedio_duracion }} <span class="fs-5 text-muted fw-normal">años</span></div>
+            <div class="metric-footer">
+                <i class="bi bi-hourglass-split text-info"></i>
+                <span>Duración teórica estándar: 5 años</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="metric-block">
+            <span class="metric-label">Edad Promedio al Egreso</span>
+            <div class="metric-value">{{ indicadores.edad_promedio }} <span class="fs-5 text-muted fw-normal">años</span></div>
+            <div class="metric-footer">
+                <i class="bi bi-calendar3 text-warning"></i>
+                <span>Calculado por año de graduación</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="metric-block">
+            <span class="metric-label">Programas de Grado</span>
+            <div class="metric-value">{{ carreras.count }}</div>
+            <div class="metric-footer">
+                <i class="bi bi-award text-success"></i>
+                <span>Carreras activas en la facultad</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos Estadísticos con Espaciado y Ritmo Visual Limpio -->
+<div class="row g-4 mb-5">
+    <!-- 1. Historial de Egresados por Año -->
+    <div class="col-lg-8">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Evolución Histórica de Graduaciones</h3>
+                    <span class="chart-panel-subtitle">Volumen de alumnos egresados por año calendario</span>
+                </div>
+            </div>
+            <div style="min-height: 260px;">
+                <canvas id="chartEgresadosPorAnio"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Distribución por Género -->
+    <div class="col-lg-4">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Distribución por Sexo</h3>
+                    <span class="chart-panel-subtitle">Proporción general</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 260px;">
+                <div style="max-width: 230px; width: 100%;">
+                    <canvas id="chartSexo"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Egresados por Carrera y Sexo (Cruzado) -->
+    <div class="col-lg-7">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Distribución por Carrera y Género</h3>
+                    <span class="chart-panel-subtitle">Total acumulado segmentado por sexo</span>
+                </div>
+            </div>
+            <div style="min-height: 260px;">
+                <canvas id="chartCarreraSexo"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Distribución por Carrera (Doughnut) -->
+    <div class="col-lg-5">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Participación por Carrera</h3>
+                    <span class="chart-panel-subtitle">Porcentaje sobre el total de egresados</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 260px;">
+                <div style="max-width: 250px; width: 100%;">
+                    <canvas id="chartEgresadosPorCarrera"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Duración de Carrera -->
+    <div class="col-lg-6">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Duración Total de la Carrera</h3>
+                    <span class="chart-panel-subtitle">Años transcurridos entre el ingreso y el egreso</span>
+                </div>
+            </div>
+            <div style="min-height: 250px;">
+                <canvas id="chartDuracionCarrera"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Duración Promedio por Año de Ingreso -->
+    <div class="col-lg-6">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Permanencia según Cohorte de Ingreso</h3>
+                    <span class="chart-panel-subtitle">Promedio de años de cursado por camada</span>
+                </div>
+            </div>
+            <div style="min-height: 250px;">
+                <canvas id="chartDuracionIngreso"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Edad al Egreso -->
+    <div class="col-lg-6">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Edad al Momento de la Graduación</h3>
+                    <span class="chart-panel-subtitle">Frecuencia por edad cumplida al culminar</span>
+                </div>
+            </div>
+            <div style="min-height: 250px;">
+                <canvas id="chartEdadEgreso"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Ciudades de Origen -->
+    <div class="col-lg-6">
+        <div class="chart-panel">
+            <div class="chart-panel-header">
+                <div>
+                    <h3 class="chart-panel-title">Procedencia Geográfica</h3>
+                    <span class="chart-panel-subtitle">Principales ciudades de origen declaradas</span>
+                </div>
+            </div>
+            <div style="min-height: 250px;">
+                <canvas id="chartCiudades"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enlace al Módulo de Tasas por Cohorte -->
+<div class="surface-panel p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h4 class="fw-bold mb-1" style="color: var(--color-navy-dark);">Matriz de Eficiencia Terminal y Retención</h4>
+        <p class="text-muted mb-0 small">
+            Consulte la serie histórica de cohortes de ingresantes versus egresados con sus tasas de graduación promedio calculadas.
+        </p>
+    </div>
+    <a href="{% url 'analitica:tasas_cohorte' %}" class="btn btn-institutional-primary">
+        <span>Explorar Tasas por Cohorte</span>
+        <i class="bi bi-arrow-right"></i>
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const dataJSON = {{ chart_data_json|safe }};
+
+    // Paleta Institucional Armónica (sin negros puros ni saturaciones excesivas)
+    const institutionalPalette = {
+        navy: '#163e6e',
+        navyDark: '#0f2744',
+        blue: '#2563eb',
+        teal: '#0d9488',
+        amber: '#d97706',
+        rose: '#e11d48',
+        slate: '#64748b',
+        carreras: ['#163e6e', '#2563eb', '#0d9488', '#d97706', '#7c3aed']
+    };
+
+    // Configuración tipográfica y de renderizado para Chart.js
+    Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.borderColor = '#f1f5f9';
+
+    // 1. Egresados por Año
+    new Chart(document.getElementById('chartEgresadosPorAnio'), {
+        type: 'bar',
+        data: {
+            labels: dataJSON.anios_egreso_labels,
+            datasets: [{
+                label: 'Graduados',
+                data: dataJSON.anios_egreso_values,
+                backgroundColor: institutionalPalette.navy,
+                borderRadius: 4,
+                maxBarThickness: 32
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Distribución por Sexo
+    new Chart(document.getElementById('chartSexo'), {
+        type: 'doughnut',
+        data: {
+            labels: dataJSON.sexo_labels,
+            datasets: [{
+                data: dataJSON.sexo_values,
+                backgroundColor: [institutionalPalette.navy, institutionalPalette.rose],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } }
+            },
+            cutout: '72%'
+        }
+    });
+
+    // 3. Egresados por Carrera y Sexo
+    const carrerasCruzadas = Object.keys(dataJSON.carrera_sexo);
+    const masculinosCruzados = carrerasCruzadas.map(c => dataJSON.carrera_sexo[c].M || 0);
+    const femeninosCruzados = carrerasCruzadas.map(c => dataJSON.carrera_sexo[c].F || 0);
+
+    new Chart(document.getElementById('chartCarreraSexo'), {
+        type: 'bar',
+        data: {
+            labels: carrerasCruzadas.map(c => c.replace('Ingeniería ', 'Ing. ')),
+            datasets: [
+                {
+                    label: 'Masculino',
+                    data: masculinosCruzados,
+                    backgroundColor: institutionalPalette.navy,
+                    borderRadius: 4,
+                    maxBarThickness: 28
+                },
+                {
+                    label: 'Femenino',
+                    data: femeninosCruzados,
+                    backgroundColor: institutionalPalette.rose,
+                    borderRadius: 4,
+                    maxBarThickness: 28
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', align: 'end', labels: { boxWidth: 12 } }
+            },
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } }
+            }
+        }
+    });
+
+    // 4. Distribución por Carrera (Doughnut)
+    new Chart(document.getElementById('chartEgresadosPorCarrera'), {
+        type: 'doughnut',
+        data: {
+            labels: dataJSON.carreras_labels.map(c => c.replace('Ingeniería ', 'Ing. ')),
+            datasets: [{
+                data: dataJSON.carreras_values,
+                backgroundColor: institutionalPalette.carreras,
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }
+            },
+            cutout: '68%'
+        }
+    });
+
+    // 5. Duración de Carrera
+    new Chart(document.getElementById('chartDuracionCarrera'), {
+        type: 'bar',
+        data: {
+            labels: dataJSON.duracion_labels,
+            datasets: [{
+                label: 'Egresados',
+                data: dataJSON.duracion_values,
+                backgroundColor: institutionalPalette.teal,
+                borderRadius: 4,
+                maxBarThickness: 26
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 6. Duración Promedio por Año de Ingreso
+    new Chart(document.getElementById('chartDuracionIngreso'), {
+        type: 'line',
+        data: {
+            labels: dataJSON.duracion_ingreso_labels,
+            datasets: [{
+                label: 'Años Promedio',
+                data: dataJSON.duracion_ingreso_values,
+                borderColor: institutionalPalette.blue,
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.25,
+                pointBackgroundColor: institutionalPalette.blue,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: false, min: 4, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 7. Edad al Egreso
+    new Chart(document.getElementById('chartEdadEgreso'), {
+        type: 'bar',
+        data: {
+            labels: dataJSON.edad_labels,
+            datasets: [{
+                label: 'Egresados',
+                data: dataJSON.edad_values,
+                backgroundColor: institutionalPalette.slate,
+                borderRadius: 4,
+                maxBarThickness: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 8. Ciudades de Origen
+    new Chart(document.getElementById('chartCiudades'), {
+        type: 'bar',
+        data: {
+            labels: dataJSON.ciudades_labels,
+            datasets: [{
+                label: 'Egresados',
+                data: dataJSON.ciudades_values,
+                backgroundColor: institutionalPalette.navy,
+                borderRadius: 4,
+                maxBarThickness: 18
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

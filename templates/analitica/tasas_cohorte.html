@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Tasas de Graduación por Cohorte | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1 class="section-title">Tasas de Graduación por Cohorte</h1>
+        <p class="section-description">
+            Evaluación de eficiencia terminal académica por carrera y camada de ingreso, comparada contra la retención histórica institucional.
+        </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label class="form-label-institutional mb-0 text-nowrap d-none d-sm-inline">Filtrar Carrera:</label>
+            <select name="carrera" class="form-select form-select-institutional form-select-sm" onchange="this.form.submit()">
+                <option value="">Todas las carreras</option>
+                {% for c in carreras %}
+                    <option value="{{ c.id }}" {% if carrera_id == c.id %}selected{% endif %}>
+                        {{ c.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex flex-column gap-5">
+    {% for item in tasas %}
+        <div class="surface-panel overflow-hidden">
+            <!-- Barra de Encabezado de la Carrera -->
+            <div class="px-4 py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="background-color: #fafbfc;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-inline-flex p-2 rounded bg-white border text-primary">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold" style="color: var(--color-navy-dark); font-size: 1.15rem;">
+                            {{ item.carrera.nombre }}
+                        </h4>
+                        <span class="text-muted small">Duración del plan curricular: {{ item.carrera.duracion_teorica }} años</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">Tasa Promedio Histórica:</span>
+                    <span class="badge-subtle badge-subtle-primary fs-6 px-2.5 py-1">
+                        <strong>{{ item.tasa_promedio_historica }}%</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de Cohortes -->
+            <div class="table-responsive">
+                <table class="table-institutional">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 180px;">Cohorte de Ingreso</th>
+                            <th class="text-center" style="width: 140px;">Ingresantes</th>
+                            <th class="text-center" style="width: 140px;">Graduados</th>
+                            <th class="text-center" style="width: 160px;">Tasa de Graduación</th>
+                            <th class="pe-4">Proporción de Eficiencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ch in item.cohortes %}
+                            <tr>
+                                <td class="ps-4 fw-bold font-monospace" style="color: var(--color-navy);">
+                                    Camada {{ ch.anio_cohorte }}
+                                </td>
+                                <td class="text-center font-monospace">{{ ch.ingresantes }}</td>
+                                <td class="text-center font-monospace">{{ ch.egresados }}</td>
+                                <td class="text-center">
+                                    <span class="badge-subtle {% if ch.tasa >= 30 %}badge-subtle-success{% elif ch.tasa >= 15 %}badge-subtle-info{% else %}badge-subtle-neutral{% endif %} font-monospace">
+                                        {{ ch.tasa }}%
+                                    </span>
+                                </td>
+                                <td class="pe-4">
+                                    <div class="progress-retention">
+                                        <div class="progress-bar {% if ch.tasa >= 30 %}bg-success{% elif ch.tasa >= 15 %}bg-info{% else %}bg-secondary{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ ch.tasa|floatformat:0 }}%;" 
+                                             aria-valuenow="{{ ch.tasa }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No se registran datos de cohorte para esta carrera.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
