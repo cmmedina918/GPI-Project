@@ -5,4 +5,4 @@
 *.xlsx
 *.md
 **/migrations/*.py
-**/migrations/*.init
+!**/migrations/__init__.py
