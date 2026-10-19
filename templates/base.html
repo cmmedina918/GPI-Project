@@ -28,95 +28,198 @@
 
     {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <!-- Encabezado Institucional Superior -->
-    <header class="navbar navbar-expand-lg navbar-dark navbar-institutional sticky-top">
-        <div class="container-fluid px-lg-5 px-3">
-            <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="{% url 'analitica:dashboard' %}">
-                <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-2 p-1 shadow-sm" style="width: 44px; height: 44px;">
-                    <img src="{% static 'icons/logofcytunca.png' %}" alt="Logo FCyT UNCA" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                </div>
-                <div>
-                    <span class="brand-title d-block">FCyT &bull; UNCA</span>
-                    <span class="brand-subtitle">Gestión y Analítica de Egresados</span>
-                </div>
-            </a>
-            
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal" aria-controls="navPrincipal" aria-expanded="false" aria-label="Navegación">
-                <i class="bi bi-list fs-4 text-white"></i>
-            </button>
+<body class="sidebar-layout">
+    <div class="app-wrapper">
+        <!-- Sidebar Collapsable Institucional -->
+        <aside class="app-sidebar" id="appSidebar">
+            <!-- Encabezado Sidebar -->
+            <div class="sidebar-header">
+                <a class="sidebar-brand" href="{% url 'analitica:dashboard' %}" title="FCyT UNCA - Gestión de Egresados">
+                    <div class="sidebar-brand-logo">
+                        <img src="{% static 'icons/fctunca.edu.py-512x512.png' %}" alt="Logo FCyT" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <span class="sidebar-brand-title">FCyT &bull; UNCA</span>
+                        <span class="sidebar-brand-subtitle">Gestión de Egresados</span>
+                    </div>
+                </a>
+            </div>
 
-            <div class="collapse navbar-collapse" id="navPrincipal">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
-                    <li class="nav-item">
-                        <a class="nav-link d-inline-flex align-items-center gap-2 {% if request.resolver_match.app_name == 'analitica' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'analitica:dashboard' %}">
-                            <i class="bi bi-speedometer2 opacity-75"></i><span>Tablero</span>
+            <!-- Navegación -->
+            <div class="sidebar-nav-container">
+                <div class="sidebar-section-title">Analítica Académica</div>
+                <ul class="sidebar-nav mb-3">
+                    <li>
+                        <a class="sidebar-link {% if request.resolver_match.app_name == 'analitica' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'analitica:dashboard' %}" title="Tablero Analítico">
+                            <i class="bi bi-speedometer2"></i>
+                            <span class="sidebar-link-text">Tablero General</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-inline-flex align-items-center gap-2 {% if request.resolver_match.app_name == 'analitica' and request.resolver_match.url_name == 'tasas_cohorte' %}active{% endif %}" href="{% url 'analitica:tasas_cohorte' %}">
-                            <i class="bi bi-graph-up-arrow opacity-75"></i><span>Tasas por Cohorte</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-inline-flex align-items-center gap-2 {% if request.resolver_match.app_name == 'egresados' and request.resolver_match.url_name == 'lista' %}active{% endif %}" href="{% url 'egresados:lista' %}">
-                            <i class="bi bi-people opacity-75"></i><span>Egresados</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link d-inline-flex align-items-center gap-2 {% if request.resolver_match.app_name == 'egresados' and request.resolver_match.url_name == 'carreras' %}active{% endif %}" href="{% url 'egresados:carreras' %}">
-                            <i class="bi bi-journal-bookmark opacity-75"></i><span>Carreras</span>
+                    <li>
+                        <a class="sidebar-link {% if request.resolver_match.app_name == 'analitica' and request.resolver_match.url_name == 'tasas_cohorte' %}active{% endif %}" href="{% url 'analitica:tasas_cohorte' %}" title="Tasas por Cohorte">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span class="sidebar-link-text">Tasas por Cohorte</span>
                         </a>
                     </li>
                 </ul>
 
-                <div class="d-flex align-items-center gap-2 pt-2 pt-lg-0">
-                    <a href="{% url 'egresados:crear' %}" class="btn btn-warning btn-sm fw-semibold px-3 py-1.5 text-dark shadow-sm">
-                        <i class="bi bi-plus-lg"></i>
-                        <span>Nuevo Egresado</span>
-                    </a>
-                    <a href="{% url 'admin:index' %}" class="btn btn-outline-light btn-sm px-3 py-1.5 opacity-75" target="_blank" title="Administración de Django">
-                        <i class="bi bi-shield-lock"></i>
-                        <span>Admin</span>
+                <div class="sidebar-section-title">Padrón Institucional</div>
+                <ul class="sidebar-nav mb-3">
+                    <li>
+                        <a class="sidebar-link {% if request.resolver_match.app_name == 'egresados' and request.resolver_match.url_name == 'lista' %}active{% endif %}" href="{% url 'egresados:lista' %}" title="Banco de Egresados">
+                            <i class="bi bi-people"></i>
+                            <span class="sidebar-link-text">Egresados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link {% if request.resolver_match.app_name == 'egresados' and request.resolver_match.url_name == 'cohortes' %}active{% endif %}" href="{% url 'egresados:cohortes' %}" title="Cohortes de Ingresantes">
+                            <i class="bi bi-calendar3"></i>
+                            <span class="sidebar-link-text">Cohortes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link {% if request.resolver_match.app_name == 'egresados' and request.resolver_match.url_name == 'carreras' %}active{% endif %}" href="{% url 'egresados:carreras' %}" title="Catálogo de Carreras">
+                            <i class="bi bi-journal-bookmark"></i>
+                            <span class="sidebar-link-text">Carreras</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="sidebar-section-title">Acciones Rápidas</div>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a class="sidebar-link text-warning" href="{% url 'egresados:crear' %}" title="Registrar Nuevo Egresado">
+                            <i class="bi bi-person-plus text-warning"></i>
+                            <span class="sidebar-link-text">Nuevo Egresado</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="sidebar-link text-info" href="{% url 'egresados:crear_cohorte' %}" title="Cargar Nueva Cohorte">
+                            <i class="bi bi-cloud-plus text-info"></i>
+                            <span class="sidebar-link-text">Nueva Cohorte</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Pie del Sidebar con Control de Colapso Integrado -->
+            <div class="sidebar-footer">
+                <a href="{% url 'admin:index' %}" class="sidebar-link py-1 px-2" target="_blank" title="Administración Django">
+                    <i class="bi bi-shield-lock"></i>
+                    <span class="sidebar-link-text">Admin Django</span>
+                </a>
+                
+                <button class="sidebar-toggle-action" id="sidebarCollapseBtn" type="button" aria-label="Colapsar menú lateral" title="Colapsar o expandir barra lateral">
+                    <i class="bi bi-layout-sidebar-inset"></i>
+                    <span class="sidebar-toggle-text">Colapsar barra lateral</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Backdrop para dispositivos móviles -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Área Principal -->
+        <div class="app-main">
+            <!-- Barra Superior Fija (Topbar) -->
+            <header class="app-topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Toggle solo visible en pantallas móviles / tablet -->
+                    <button class="topbar-toggle-btn d-lg-none" id="sidebarMobileToggle" type="button" aria-label="Abrir menú lateral" title="Menú lateral">
+                        <i class="bi bi-list fs-4"></i>
+                    </button>
+                    <span class="topbar-title d-none d-sm-inline">
+                        Facultad de Ciencias y Tecnologías &bull; Universidad Nacional de Caaguazú
+                    </span>
+                    <span class="topbar-title d-inline d-sm-none">
+                        FCyT &bull; UNCA
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'egresados:crear' %}" class="btn btn-institutional-primary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        <span class="d-none d-md-inline">Nuevo Egresado</span>
                     </a>
                 </div>
-            </div>
-        </div>
-    </header>
+            </header>
 
-    <!-- Contenedor Principal Amplio y Despejado -->
-    <main class="container-fluid px-lg-5 px-3 py-4">
-        {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'primary' }} alert-dismissible fade show border-0 shadow-sm d-flex align-items-center gap-2 py-2.5 px-3" role="alert">
-                        <i class="bi bi-info-circle-fill"></i>
-                        <span class="small fw-medium">{{ message }}</span>
-                        <button type="button" class="btn-close ms-auto p-2" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            <!-- Contenido Principal -->
+            <main class="container-fluid px-lg-5 px-3 py-4 flex-grow-1">
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'primary' }} alert-dismissible fade show border-0 shadow-sm d-flex align-items-center gap-2 py-2.5 px-3" role="alert">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <span class="small fw-medium">{{ message }}</span>
+                                <button type="button" class="btn-close ms-auto p-2" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                {% endif %}
 
-        {% block content %}{% endblock %}
-    </main>
+                {% block content %}{% endblock %}
+            </main>
 
-    <!-- Pie de Página Sobrio y Despejado -->
-    <footer class="mt-5 py-4 border-top bg-transparent">
-        <div class="container-fluid px-lg-5 px-3 d-flex flex-wrap justify-content-between align-items-center text-muted small gap-2">
-            <div>
-                <strong>Facultad de Ciencias y Tecnologías</strong> &bull; Universidad Nacional de Caaguazú (UNCA)
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <span>Ley N° 7593/2025 de Protección de Datos Personales</span>
-                <span>&bull;</span>
-                <span>Gestión de Proyectos Informáticos</span>
-            </div>
+            <!-- Pie de Página Institucional -->
+            <footer class="py-3 px-lg-5 px-3 border-top bg-white mt-auto">
+                <div class="d-flex flex-wrap justify-content-between align-items-center text-muted small gap-2">
+                    <div>
+                        <strong>Facultad de Ciencias y Tecnologías</strong> &bull; Universidad Nacional de Caaguazú (UNCA)
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                    </div>
+                </div>
+            </footer>
         </div>
-    </footer>
+    </div>
 
     <!-- Bootstrap 5 Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script de Control del Sidebar Collapsable -->
+    <script>
+        (function() {
+            const body = document.body;
+            const collapseBtn = document.getElementById('sidebarCollapseBtn');
+            const mobileToggleBtn = document.getElementById('sidebarMobileToggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            // Leer estado colapsado guardado en localStorage para recordar preferencia en escritorio
+            const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+            if (isCollapsed && window.innerWidth >= 992) {
+                body.classList.add('sidebar-collapsed');
+            }
+
+            // Alternancia en escritorio desde el botón integrado en el sidebar
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', function() {
+                    body.classList.toggle('sidebar-collapsed');
+                    localStorage.setItem('sidebar_collapsed', body.classList.contains('sidebar-collapsed'));
+                });
+            }
+
+            // Apertura/cierre en móviles
+            if (mobileToggleBtn) {
+                mobileToggleBtn.addEventListener('click', function() {
+                    body.classList.toggle('sidebar-mobile-open');
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', function() {
+                    body.classList.remove('sidebar-mobile-open');
+                });
+            }
+
+            // Cerrar menú móvil al redimensionar a pantalla de escritorio
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    body.classList.remove('sidebar-mobile-open');
+                }
+            });
+        })();
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
