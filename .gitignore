@@ -3,6 +3,7 @@
 .venv
 .idea
 *.xlsx
+*.ods
 *.md
 **/migrations/*.py
 !**/migrations/__init__.py
