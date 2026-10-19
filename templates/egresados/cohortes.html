@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load egresados_tags %}
+
+{% block title %}Gestión de Cohortes de Ingresantes | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="section-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1 class="section-title">Cohortes de Ingresantes</h1>
+        <p class="section-description">
+            Registro y administración de la cantidad de estudiantes ingresantes por carrera, año de ingreso y distribución por sexo.
+            <span class="badge-subtle badge-subtle-neutral ms-1">{{ total_cohortes }} registros cargados</span>
+        </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'analitica:tasas_cohorte' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-graph-up-arrow me-1"></i>Ver Tasas de Graduación
+        </a>
+        <a href="{% url 'egresados:crear_cohorte' %}" class="btn btn-institutional-primary shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i>Registrar Nueva Cohorte
+        </a>
+    </div>
+</div>
+
+<!-- Filtros de Consulta Rápida -->
+<div class="surface-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-lg-5 col-md-6">
+            <select name="carrera" class="form-select form-select-institutional form-select-sm">
+                <option value="">Todas las Carreras</option>
+                {% for c in carreras %}
+                    <option value="{{ c.id }}" {% if carrera_id == c.id|stringformat:"i" %}selected{% endif %}>{{ c.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-4">
+            <select name="anio" class="form-select form-select-institutional form-select-sm">
+                <option value="">Todos los Años de Cohorte</option>
+                {% for a in anios_disponibles %}
+                    <option value="{{ a }}" {% if anio == a|stringformat:"i" %}selected{% endif %}>Año {{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-institutional-primary btn-sm w-100">
+                <i class="bi bi-filter me-1"></i>Filtrar
+            </button>
+            {% if carrera_id or anio %}
+                <a href="{% url 'egresados:cohortes' %}" class="btn btn-institutional-secondary btn-sm" title="Limpiar"><i class="bi bi-x"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="row g-4">
+    <!-- Tabla de Cohortes -->
+    <div class="col-lg-8">
+        <div class="surface-panel overflow-hidden">
+            <div class="px-4 py-3 border-bottom d-flex justify-content-between align-items-center" style="background-color: #fafbfc;">
+                <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.05em;">Padrón de Cohortes Cargadas</span>
+                <span class="badge-subtle badge-subtle-primary font-monospace">{{ page_obj.paginator.count }} totales</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table-institutional">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Año</th>
+                            <th>Carrera</th>
+                            <th class="text-center">Masculino</th>
+                            <th class="text-center">Femenino</th>
+                            <th class="text-center">Total Ingresantes</th>
+                            <th class="text-end pe-4" style="width: 110px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                            <tr>
+                                <td class="ps-4 font-monospace fw-bold text-navy" style="font-size: 0.95rem;">
+                                    {{ item.anio_cohorte }}
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ item.carrera.nombre }}</span>
+                                </td>
+                                <td class="text-center font-monospace">
+                                    <span class="badge-subtle badge-subtle-primary">
+                                        <i class="bi bi-gender-male me-0.5"></i>{{ item.cantidad_masculino }}
+                                    </span>
+                                </td>
+                                <td class="text-center font-monospace">
+                                    <span class="badge-subtle badge-subtle-neutral text-danger">
+                                        <i class="bi bi-gender-female me-0.5"></i>{{ item.cantidad_femenino }}
+                                    </span>
+                                </td>
+                                <td class="text-center font-monospace fw-bold">
+                                    <span class="fs-6 text-dark">{{ item.cantidad_ingresantes }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'egresados:editar_cohorte' item.id %}" class="btn btn-outline-secondary p-1 px-2" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="{% url 'egresados:eliminar_cohorte' item.id %}" class="btn btn-outline-danger p-1 px-2" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    No se encontraron cohortes registradas con los filtros seleccionados.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+                <div class="px-4 py-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-light">
+                    <span class="text-muted small">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0 gap-1">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link border-0 text-muted" href="?{% url_replace page=1 %}">&laquo; Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link border rounded text-dark" href="?{% url_replace page=page_obj.previous_page_number %}">Anterior</a>
+                                </li>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link border rounded text-dark" href="?{% url_replace page=page_obj.next_page_number %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link border-0 text-muted" href="?{% url_replace page=page_obj.paginator.num_pages %}">Última &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Carga Rápida de Cohorte -->
+    <div class="col-lg-4">
+        <div class="surface-panel p-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-cloud-plus text-primary fs-5"></i>
+                <span class="text-uppercase fw-bold text-navy small" style="letter-spacing: 0.05em;">Carga Rápida de Ingresantes</span>
+            </div>
+            <p class="text-muted small mb-3">
+                Cargue las cantidades de nuevos alumnos ingresantes por carrera y año. Si especifica las cantidades de hombres y mujeres, el sistema calculará automáticamente el total de la cohorte.
+            </p>
+            <form method="post" action="{% url 'egresados:crear_cohorte' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label-institutional">Carrera</label>
+                    {{ form.carrera }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-institutional">Año de la Cohorte (Ingreso)</label>
+                    {{ form.anio_cohorte }}
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label-institutional text-primary">
+                            <i class="bi bi-gender-male me-1"></i>Hombres
+                        </label>
+                        {{ form.cantidad_masculino }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label-institutional text-danger">
+                            <i class="bi bi-gender-female me-1"></i>Mujeres
+                        </label>
+                        {{ form.cantidad_femenino }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label-institutional">Total Ingresantes (Opcional si carga sexos)</label>
+                    {{ form.cantidad_ingresantes }}
+                    <div class="form-text small">Si se deja en 0, se asignará automáticamente la suma de ambos sexos.</div>
+                </div>
+                <button type="submit" class="btn btn-institutional-primary w-100">
+                    <i class="bi bi-check-circle me-1"></i>Guardar Cohorte
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

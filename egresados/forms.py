@@ -1,5 +1,6 @@
 from django import forms
-from .models import Egresado, Carrera
+from .models import Egresado, Carrera, CohorteIngresantes
+
 
 
 class EgresadoForm(forms.ModelForm):
@@ -50,3 +51,31 @@ class CarreraForm(forms.ModelForm):
             'duracion_teorica': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '5'}),
             'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+class CohorteIngresantesForm(forms.ModelForm):
+    class Meta:
+        model = CohorteIngresantes
+        fields = ['carrera', 'anio_cohorte', 'cantidad_masculino', 'cantidad_femenino', 'cantidad_ingresantes']
+        widgets = {
+            'carrera': forms.Select(attrs={'class': 'form-select'}),
+            'anio_cohorte': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 2024'}),
+            'cantidad_masculino': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0', 'min': '0'}),
+            'cantidad_femenino': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0', 'min': '0'}),
+            'cantidad_ingresantes': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Total automático si se deja en 0 o suma', 'min': '0'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cant_m = cleaned_data.get('cantidad_masculino') or 0
+        cant_f = cleaned_data.get('cantidad_femenino') or 0
+        total = cleaned_data.get('cantidad_ingresantes') or 0
+
+        # Si se especificaron valores por sexo y el total está vacío o en 0, calcularlo automáticamente
+        if (cant_m > 0 or cant_f > 0) and (not total or total == 0):
+            cleaned_data['cantidad_ingresantes'] = cant_m + cant_f
+        elif total > 0 and (cant_m + cant_f > total):
+            self.add_error('cantidad_ingresantes', "El total no puede ser inferior a la suma de ingresantes masculinos y femeninos.")
+
+        return cleaned_data
+

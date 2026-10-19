@@ -79,51 +79,366 @@ h1, h2, h3, h4, h5, h6, .display-heading {
     outline-offset: 2px;
 }
 
-/* Navbar Institucional */
-.navbar-institutional {
-    background-color: var(--color-navy-dark);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
+/* ==========================================================================
+   Estructura con Sidebar Colapsable Institucional
+   ========================================================================== */
+
+:root {
+    --sidebar-width: 270px;
+    --sidebar-width-collapsed: 78px;
+    --topbar-height: 60px;
 }
 
-.navbar-institutional .brand-title {
+/* App Wrapper */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-bg-canvas);
+    transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Sidebar Styling */
+.app-sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background-color: var(--color-navy-dark);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1040;
+    transition: width 240ms cubic-bezier(0.2, 0, 0, 1), transform 240ms cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 2px 0 12px rgba(15, 39, 68, 0.12);
+    overflow: hidden;
+}
+
+/* Encabezado del Sidebar */
+.sidebar-header {
+    height: var(--topbar-height);
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    gap: 0.85rem;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: #ffffff;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.sidebar-brand-logo {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    background-color: #ffffff;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    box-shadow: var(--shadow-subtle);
+}
+
+.sidebar-brand-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 180ms ease;
+}
+
+.sidebar-brand-title {
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: 1.05rem;
-    letter-spacing: -0.02em;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
     color: #ffffff;
+    line-height: 1.2;
 }
 
-.navbar-institutional .brand-subtitle {
-    font-size: 0.72rem;
-    font-weight: 500;
+.sidebar-brand-subtitle {
+    font-size: 0.65rem;
+    font-weight: 600;
     color: #94a3b8;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    display: block;
     line-height: 1.1;
 }
 
-.navbar-institutional .nav-link {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #cbd5e1;
-    padding: 0.5rem 0.9rem;
-    border-radius: var(--radius-sm);
-    transition: all 180ms ease;
+/* Navegación y Enlaces */
+.sidebar-nav-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 0.75rem;
 }
 
-.navbar-institutional .nav-link:hover {
+.sidebar-section-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    padding: 0.75rem 0.6rem 0.4rem;
+    white-space: nowrap;
+    transition: opacity 160ms ease;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: var(--radius-sm);
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background-color 150ms ease, color 150ms ease;
+    white-space: nowrap;
+    position: relative;
+}
+
+.sidebar-link i {
+    font-size: 1.15rem;
+    min-width: 1.5rem;
+    text-align: center;
+    color: #94a3b8;
+    transition: color 150ms ease;
+}
+
+.sidebar-link:hover {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.08);
 }
 
-.navbar-institutional .nav-link.active {
+.sidebar-link:hover i {
     color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.sidebar-link.active {
+    color: #ffffff;
+    background-color: rgba(37, 99, 235, 0.22);
     font-weight: 600;
 }
+
+.sidebar-link.active i {
+    color: #60a5fa;
+}
+
+.sidebar-link-text {
+    opacity: 1;
+}
+
+
+/* Pie del Sidebar */
+.sidebar-footer {
+    padding: 0.85rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-sm);
+    color: #94a3b8;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+    width: 100%;
+    text-align: left;
+}
+
+.sidebar-toggle-action i {
+    font-size: 1.15rem;
+    min-width: 1.5rem;
+    text-align: center;
+    transition: transform 200ms ease;
+}
+
+.sidebar-toggle-action:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-toggle-text {
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.sidebar-footer-info {
+    font-size: 0.72rem;
+    color: #64748b;
+    padding: 0 0.5rem;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Área de Contenido Principal */
+.app-main {
+    flex: 1 1 auto;
+    margin-left: var(--sidebar-width);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left 240ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Topbar Superior */
+.app-topbar {
+    height: var(--topbar-height);
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    box-shadow: var(--shadow-subtle);
+}
+
+.topbar-toggle-btn {
+    border: none;
+    background: transparent;
+    color: var(--color-text-main);
+    font-size: 1.25rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.topbar-toggle-btn:hover {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-navy);
+}
+
+.topbar-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-navy-dark);
+}
+
+/* Estado Colapsado en Escritorio */
+body.sidebar-collapsed .app-sidebar {
+    width: var(--sidebar-width-collapsed);
+    min-width: var(--sidebar-width-collapsed);
+}
+
+body.sidebar-collapsed .app-main {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
+body.sidebar-collapsed .sidebar-brand-text,
+body.sidebar-collapsed .sidebar-section-title,
+body.sidebar-collapsed .sidebar-link-text,
+body.sidebar-collapsed .sidebar-toggle-text,
+body.sidebar-collapsed .sidebar-footer-info {
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+
+body.sidebar-collapsed .sidebar-link,
+body.sidebar-collapsed .sidebar-toggle-action {
+    justify-content: center;
+    padding: 0.75rem 0;
+}
+
+body.sidebar-collapsed .sidebar-toggle-action i {
+    transform: rotate(180deg);
+}
+
+body.sidebar-collapsed .sidebar-link i,
+body.sidebar-collapsed .sidebar-toggle-action i {
+    min-width: unset;
+    font-size: 1.25rem;
+}
+
+body.sidebar-collapsed .sidebar-brand {
+    justify-content: center;
+    width: 100%;
+}
+
+/* Tooltip al estar colapsado (usando title nativo) */
+body.sidebar-collapsed .sidebar-link::after {
+    display: none;
+}
+
+/* Backdrop para Móviles */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 39, 68, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1035;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+/* Responsividad Móvil y Tablet */
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+    }
+
+    body.sidebar-mobile-open .app-sidebar {
+        transform: translateX(0);
+    }
+
+    body.sidebar-mobile-open .sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
 
 /* Encabezados de Sección Abiertos (Sin enmarcar en cajas rígidas) */
 .section-header {
@@ -246,6 +561,34 @@ h1, h2, h3, h4, h5, h6, .display-heading {
     border-top: none;
     white-space: nowrap;
 }
+
+.table-institutional thead th a.sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: color 140ms ease;
+}
+
+.table-institutional thead th a.sort-link:hover {
+    color: var(--color-navy);
+}
+
+.table-institutional thead th a.sort-link.is-active {
+    color: var(--color-navy);
+}
+
+.table-institutional thead th .sort-icon {
+    font-size: 0.75rem;
+    opacity: 0.45;
+}
+
+.table-institutional thead th a.sort-link.is-active .sort-icon {
+    opacity: 1;
+    color: var(--color-navy-light);
+}
+
 
 .table-institutional tbody td {
     padding: 0.9rem 1rem;
@@ -393,3 +736,19 @@ h1, h2, h3, h4, h5, h6, .display-heading {
     background-color: var(--color-navy);
     border-radius: 999px;
 }
+
+/* Panel de Filtros Adhesivo (Sticky) */
+.sticky-filters-wrapper {
+    position: sticky;
+    top: calc(var(--topbar-height) + 12px);
+    z-index: 1020;
+    transition: all 0.2s ease-in-out;
+}
+
+.sticky-filters-wrapper.is-sticky-active {
+    box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.12), 0 8px 10px -6px rgba(15, 39, 68, 0.08);
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(8px);
+}
+

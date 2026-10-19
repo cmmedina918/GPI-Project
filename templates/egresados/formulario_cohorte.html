@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="section-title fs-3 mb-1">{{ titulo }}</h1>
+                <p class="section-description small">
+                    Administre la cohorte institucional detallando el año, programa académico y volumen de ingresantes por sexo.
+                </p>
+            </div>
+            <a href="{% url 'egresados:cohortes' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+
+        <div class="surface-panel p-4">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 px-3 small">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label-institutional" for="{{ form.carrera.id_for_label }}">Carrera / Programa Académico</label>
+                    {{ form.carrera }}
+                    {% if form.carrera.errors %}
+                        <div class="text-danger small mt-1">{{ form.carrera.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-institutional" for="{{ form.anio_cohorte.id_for_label }}">Año de Ingreso / Cohorte</label>
+                    {{ form.anio_cohorte }}
+                    {% if form.anio_cohorte.errors %}
+                        <div class="text-danger small mt-1">{{ form.anio_cohorte.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <span class="text-uppercase fw-bold text-muted small d-block mb-2" style="letter-spacing: 0.05em;">
+                        Desglose de Ingresantes por Sexo
+                    </span>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label-institutional text-primary" for="{{ form.cantidad_masculino.id_for_label }}">
+                                <i class="bi bi-gender-male me-1"></i>Hombres (Masculino)
+                            </label>
+                            {{ form.cantidad_masculino }}
+                            {% if form.cantidad_masculino.errors %}
+                                <div class="text-danger small mt-1">{{ form.cantidad_masculino.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label-institutional text-danger" for="{{ form.cantidad_femenino.id_for_label }}">
+                                <i class="bi bi-gender-female me-1"></i>Mujeres (Femenino)
+                            </label>
+                            {{ form.cantidad_femenino }}
+                            {% if form.cantidad_femenino.errors %}
+                                <div class="text-danger small mt-1">{{ form.cantidad_femenino.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-institutional" for="{{ form.cantidad_ingresantes.id_for_label }}">
+                        Total Consolidado de Ingresantes
+                    </label>
+                    {{ form.cantidad_ingresantes }}
+                    <div class="form-text small">
+                        Si introduce cantidades por sexo y deja este campo en 0 o vacío, el sistema calculará automáticamente el total.
+                    </div>
+                    {% if form.cantidad_ingresantes.errors %}
+                        <div class="text-danger small mt-1">{{ form.cantidad_ingresantes.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                    <a href="{% url 'egresados:cohortes' %}" class="btn btn-institutional-secondary">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-institutional-primary px-4">
+                        <i class="bi bi-check-lg me-1"></i>Guardar Registro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

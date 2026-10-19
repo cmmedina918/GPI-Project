@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load egresados_tags %}
 
 {% block title %}Banco de Graduados y Egresados | FCyT UNCA{% endblock %}
 
@@ -19,45 +20,49 @@
     </div>
 </div>
 
-<!-- Filtros de Consulta Rápida -->
-<div class="surface-panel p-3 mb-4">
-    <form method="get" class="row g-2 align-items-center">
-        <div class="col-lg-4 col-md-6">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                <input type="text" name="q" class="form-control form-control-institutional border-start-0" placeholder="Buscar por Nombre, CIN, N° o Ciudad..." value="{{ query }}">
+<!-- Filtros de Consulta Rápida (Sticky) -->
+<div class="sticky-filters-wrapper is-sticky-active mb-4">
+    <div class="surface-panel p-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control form-control-institutional border-start-0" placeholder="Buscar por Nombre, CIN, N° o Ciudad..." value="{{ query }}">
+                </div>
             </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <select name="carrera" class="form-select form-select-institutional form-select-sm">
-                <option value="">Todas las Carreras</option>
-                {% for c in carreras %}
-                    <option value="{{ c.id }}" {% if carrera_id == c.id|stringformat:"i" %}selected{% endif %}>{{ c.nombre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-lg-2 col-md-4">
-            <select name="sexo" class="form-select form-select-institutional form-select-sm">
-                <option value="">Cualquier Sexo</option>
-                <option value="M" {% if sexo == 'M' %}selected{% endif %}>Masculino</option>
-                <option value="F" {% if sexo == 'F' %}selected{% endif %}>Femenino</option>
-            </select>
-        </div>
-        <div class="col-lg-2 col-md-4">
-            <select name="anio_egreso" class="form-select form-select-institutional form-select-sm">
-                <option value="">Año de Graduación</option>
-                {% for anio in anios_egreso %}
-                    <option value="{{ anio }}" {% if anio_egreso == anio|stringformat:"i" %}selected{% endif %}>{{ anio }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-lg-1 col-md-4 d-flex gap-1">
-            <button type="submit" class="btn btn-institutional-primary btn-sm w-100">Filtrar</button>
-            {% if query or carrera_id or sexo or anio_egreso %}
-                <a href="{% url 'egresados:lista' %}" class="btn btn-institutional-secondary btn-sm" title="Limpiar"><i class="bi bi-x"></i></a>
-            {% endif %}
-        </div>
-    </form>
+            <div class="col-lg-3 col-md-6">
+                <select name="carrera" class="form-select form-select-institutional form-select-sm">
+                    <option value="">Todas las Carreras</option>
+                    {% for c in carreras %}
+                        <option value="{{ c.id }}" {% if carrera_id == c.id|stringformat:"i" %}selected{% endif %}>{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <select name="sexo" class="form-select form-select-institutional form-select-sm">
+                    <option value="">Cualquier Sexo</option>
+                    <option value="M" {% if sexo == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="F" {% if sexo == 'F' %}selected{% endif %}>Femenino</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <select name="anio_egreso" class="form-select form-select-institutional form-select-sm">
+                    <option value="">Año de Graduación</option>
+                    {% for anio in anios_egreso %}
+                        <option value="{{ anio }}" {% if anio_egreso == anio|stringformat:"i" %}selected{% endif %}>{{ anio }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-1 col-md-4 d-flex gap-1">
+                {% if orden %}<input type="hidden" name="orden" value="{{ orden }}">{% endif %}
+                {% if direccion %}<input type="hidden" name="dir" value="{{ direccion }}">{% endif %}
+                <button type="submit" class="btn btn-institutional-primary btn-sm w-100">Filtrar</button>
+                {% if query or carrera_id or sexo or anio_egreso %}
+                    <a href="{% url 'egresados:lista' %}{% if orden or direccion %}?{% url_replace q=None carrera=None sexo=None anio_egreso=None page=None %}{% endif %}" class="btn btn-institutional-secondary btn-sm" title="Limpiar"><i class="bi bi-x"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Tabla Principal de Egresados -->
@@ -66,14 +71,54 @@
         <table class="table-institutional">
             <thead>
                 <tr>
-                    <th class="ps-4" style="width: 80px;">N°</th>
-                    <th>Egresado</th>
-                    <th>Cédula (CIN)</th>
-                    <th>Programa Académico</th>
-                    <th class="text-center">Sexo</th>
-                    <th class="text-center">Cursado</th>
-                    <th class="text-center">Permanencia</th>
-                    <th>Origen</th>
+                    <th class="ps-4" style="width: 90px;">
+                        <a href="?{% url_replace orden='numero' dir=direccion|yesno:'asc,desc' %}{% if orden != 'numero' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link {% if orden == 'numero' or orden == 'numero_egresado' %}is-active{% endif %}" title="Ordenar por Número de Egresado">
+                            <span>N°</span>
+                            <i class="bi {% if orden == 'numero' or orden == 'numero_egresado' %}{% if direccion == 'desc' %}bi-sort-numeric-down-alt text-primary{% else %}bi-sort-numeric-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% url_replace orden='egresado' %}{% if orden != 'egresado' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link {% if orden == 'egresado' or orden == 'apellidos' %}is-active{% endif %}" title="Ordenar por Nombre de Egresado">
+                            <span>Egresado</span>
+                            <i class="bi {% if orden == 'egresado' or orden == 'apellidos' %}{% if direccion == 'desc' %}bi-sort-alpha-down-alt text-primary{% else %}bi-sort-alpha-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% url_replace orden='cin' %}{% if orden != 'cin' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link {% if orden == 'cin' %}is-active{% endif %}" title="Ordenar por Cédula">
+                            <span>Cédula (CIN)</span>
+                            <i class="bi {% if orden == 'cin' %}{% if direccion == 'desc' %}bi-sort-numeric-down-alt text-primary{% else %}bi-sort-numeric-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% url_replace orden='carrera' %}{% if orden != 'carrera' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link {% if orden == 'carrera' %}is-active{% endif %}" title="Ordenar por Carrera">
+                            <span>Programa Académico</span>
+                            <i class="bi {% if orden == 'carrera' %}{% if direccion == 'desc' %}bi-sort-alpha-down-alt text-primary{% else %}bi-sort-alpha-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th class="text-center">
+                        <a href="?{% url_replace orden='sexo' %}{% if orden != 'sexo' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link justify-content-center {% if orden == 'sexo' %}is-active{% endif %}" title="Ordenar por Sexo">
+                            <span>Sexo</span>
+                            <i class="bi {% if orden == 'sexo' %}{% if direccion == 'desc' %}bi-sort-alpha-down-alt text-primary{% else %}bi-sort-alpha-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th class="text-center">
+                        <a href="?{% url_replace orden='cursado' %}{% if orden != 'cursado' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link justify-content-center {% if orden == 'cursado' or orden == 'anio_egreso' %}is-active{% endif %}" title="Ordenar por Año de Egreso">
+                            <span>Cursado</span>
+                            <i class="bi {% if orden == 'cursado' or orden == 'anio_egreso' %}{% if direccion == 'desc' %}bi-sort-numeric-down-alt text-primary{% else %}bi-sort-numeric-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th class="text-center">
+                        <a href="?{% url_replace orden='permanencia' %}{% if orden != 'permanencia' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link justify-content-center {% if orden == 'permanencia' %}is-active{% endif %}" title="Ordenar por Años de Permanencia">
+                            <span>Permanencia</span>
+                            <i class="bi {% if orden == 'permanencia' %}{% if direccion == 'desc' %}bi-sort-numeric-down-alt text-primary{% else %}bi-sort-numeric-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% url_replace orden='origen' %}{% if orden != 'origen' %}&dir=asc{% elif direccion == 'asc' %}&dir=desc{% else %}&dir=asc{% endif %}&page=1" class="sort-link {% if orden == 'origen' or orden == 'lugar_nacimiento' %}is-active{% endif %}" title="Ordenar por Lugar de Origen">
+                            <span>Origen</span>
+                            <i class="bi {% if orden == 'origen' or orden == 'lugar_nacimiento' %}{% if direccion == 'desc' %}bi-sort-alpha-down-alt text-primary{% else %}bi-sort-alpha-up text-primary{% endif %}{% else %}bi-arrow-down-up sort-icon{% endif %}"></i>
+                        </a>
+                    </th>
                     <th class="text-center">Tesis</th>
                     <th class="text-end pe-4" style="width: 100px;">Acciones</th>
                 </tr>
@@ -107,7 +152,7 @@
                         </td>
                         <td class="text-center">
                             <span class="badge-subtle badge-subtle-neutral font-monospace">
-                                {{ eg.duracion_carrera }} años
+                                {{ eg.duracion_calculada }} años
                             </span>
                         </td>
                         <td>
@@ -149,19 +194,19 @@
                 <ul class="pagination pagination-sm mb-0 gap-1">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link border-0 text-muted" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">&laquo; Primera</a>
+                            <a class="page-link border-0 text-muted" href="?{% url_replace page=1 %}">&laquo; Primera</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link border rounded text-dark" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Anterior</a>
+                            <a class="page-link border rounded text-dark" href="?{% url_replace page=page_obj.previous_page_number %}">Anterior</a>
                         </li>
                     {% endif %}
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link border rounded text-dark" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Siguiente</a>
+                            <a class="page-link border rounded text-dark" href="?{% url_replace page=page_obj.next_page_number %}">Siguiente</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link border-0 text-muted" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if carrera_id %}&carrera={{ carrera_id }}{% endif %}{% if sexo %}&sexo={{ sexo }}{% endif %}{% if anio_egreso %}&anio_egreso={{ anio_egreso }}{% endif %}">Última &raquo;</a>
+                            <a class="page-link border-0 text-muted" href="?{% url_replace page=page_obj.paginator.num_pages %}">Última &raquo;</a>
                         </li>
                     {% endif %}
                 </ul>

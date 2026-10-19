@@ -57,13 +57,23 @@ class Egresado(models.Model):
 class CohorteIngresantes(models.Model):
     carrera = models.ForeignKey(Carrera, on_delete=models.CASCADE, related_name='cohortes', verbose_name="Carrera")
     anio_cohorte = models.PositiveIntegerField(verbose_name="Año de Cohorte (Ingreso)")
-    cantidad_ingresantes = models.PositiveIntegerField(verbose_name="Cantidad de Ingresantes")
+    cantidad_ingresantes = models.PositiveIntegerField(default=0, verbose_name="Cantidad Total de Ingresantes")
+    cantidad_masculino = models.PositiveIntegerField(default=0, verbose_name="Ingresantes Masculinos")
+    cantidad_femenino = models.PositiveIntegerField(default=0, verbose_name="Ingresantes Femeninos")
 
     class Meta:
         verbose_name = "Cohorte de Ingresantes"
         verbose_name_plural = "Cohortes de Ingresantes"
         unique_together = ('carrera', 'anio_cohorte')
-        ordering = ['anio_cohorte', 'carrera']
+        ordering = ['-anio_cohorte', 'carrera__nombre']
 
     def __str__(self):
-        return f"{self.carrera.nombre} ({self.anio_cohorte}): {self.cantidad_ingresantes} ingresantes"
+        return f"{self.carrera.nombre} ({self.anio_cohorte}): {self.cantidad_ingresantes} ingresantes (M: {self.cantidad_masculino}, F: {self.cantidad_femenino})"
+
+    def save(self, *args, **kwargs):
+        # Si se ingresaron cantidades por sexo pero no el total o es menor a la suma
+        suma_sexos = (self.cantidad_masculino or 0) + (self.cantidad_femenino or 0)
+        if suma_sexos > 0 and (not self.cantidad_ingresantes or self.cantidad_ingresantes < suma_sexos):
+            self.cantidad_ingresantes = suma_sexos
+        super().save(*args, **kwargs)
+

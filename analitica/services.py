@@ -63,7 +63,7 @@ def calcular_indicadores_dashboard(filtros=None):
     # 5. Duración de carrera (Egreso - Ingreso)
     # Anotamos duracion
     qs_duracion = qs.annotate(
-        duracion=ExpressionWrapper(F('anio_egreso') - F('anio_ingreso'), output_field=IntegerField())
+        duracion=ExpressionWrapper(F('anio_egreso') - F('anio_ingreso') + 1 , output_field=IntegerField())
     )
     distribucion_duracion = list(
         qs_duracion.values('duracion')
@@ -134,11 +134,14 @@ def calcular_tasas_graduacion_cohorte(carrera_id=None):
         tasas_list = []
 
         for ch in cohortes:
-            # Egresados de esta carrera que ingresaron en este año
-            egresados_cohorte = Egresado.objects.filter(
+            # Egresados de esta carrera que ingresaron en este año (total y por sexo)
+            egresados_qs = Egresado.objects.filter(
                 carrera=carrera,
                 anio_ingreso=ch.anio_cohorte
-            ).count()
+            )
+            egresados_cohorte = egresados_qs.count()
+            egresados_m = egresados_qs.filter(sexo='M').count()
+            egresados_f = egresados_qs.filter(sexo='F').count()
 
             ingresantes = ch.cantidad_ingresantes
             if ingresantes > 0:
@@ -148,9 +151,14 @@ def calcular_tasas_graduacion_cohorte(carrera_id=None):
                 tasa = 0.0
 
             datos_cohortes.append({
+                'id': ch.id,
                 'anio_cohorte': ch.anio_cohorte,
                 'ingresantes': ingresantes,
+                'ingresantes_m': ch.cantidad_masculino,
+                'ingresantes_f': ch.cantidad_femenino,
                 'egresados': egresados_cohorte,
+                'egresados_m': egresados_m,
+                'egresados_f': egresados_f,
                 'tasa': tasa,
             })
 

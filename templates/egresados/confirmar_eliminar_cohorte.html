@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Cohorte | FCyT UNCA{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="surface-panel p-4 text-center">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger p-3 mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-exclamation-triangle fs-2"></i>
+            </div>
+            <h2 class="h4 fw-bold text-dark mb-2">¿Eliminar registro de cohorte?</h2>
+            <p class="text-muted small mb-4">
+                Está a punto de eliminar la cohorte del año <strong>{{ cohorte.anio_cohorte }}</strong> correspondiente a la carrera <strong>{{ cohorte.carrera.nombre }}</strong> con un total de <strong>{{ cohorte.cantidad_ingresantes }} ingresantes</strong>. Esta acción afectará el cálculo de las tasas de graduación para esta cohorte.
+            </p>
+
+            <form method="post" class="d-flex justify-content-center gap-2">
+                {% csrf_token %}
+                <a href="{% url 'egresados:cohortes' %}" class="btn btn-institutional-secondary px-4">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash me-1"></i>Sí, Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

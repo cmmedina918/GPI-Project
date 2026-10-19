@@ -11,6 +11,9 @@
         </p>
     </div>
     <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'egresados:cohortes' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-people-fill me-1"></i>Gestionar Cohortes
+        </a>
         <form method="get" class="d-flex align-items-center gap-2">
             <label class="form-label-institutional mb-0 text-nowrap d-none d-sm-inline">Filtrar Carrera:</label>
             <select name="carrera" class="form-select form-select-institutional form-select-sm" onchange="this.form.submit()">
@@ -54,10 +57,10 @@
                 <table class="table-institutional">
                     <thead>
                         <tr>
-                            <th class="ps-4" style="width: 180px;">Cohorte de Ingreso</th>
-                            <th class="text-center" style="width: 140px;">Ingresantes</th>
-                            <th class="text-center" style="width: 140px;">Graduados</th>
-                            <th class="text-center" style="width: 160px;">Tasa de Graduación</th>
+                            <th class="ps-4" style="width: 170px;">Cohorte de Ingreso</th>
+                            <th class="text-center" style="width: 170px;">Ingresantes</th>
+                            <th class="text-center" style="width: 170px;">Graduados</th>
+                            <th class="text-center" style="width: 150px;">Tasa de Graduación</th>
                             <th class="pe-4">Proporción de Eficiencia</th>
                         </tr>
                     </thead>
@@ -67,8 +70,22 @@
                                 <td class="ps-4 fw-bold font-monospace" style="color: var(--color-navy);">
                                     Camada {{ ch.anio_cohorte }}
                                 </td>
-                                <td class="text-center font-monospace">{{ ch.ingresantes }}</td>
-                                <td class="text-center font-monospace">{{ ch.egresados }}</td>
+                                <td class="text-center font-monospace">
+                                    <span class="fw-bold">{{ ch.ingresantes }}</span>
+                                    {% if ch.ingresantes_m or ch.ingresantes_f %}
+                                        <div class="small text-muted mt-0.5" style="font-size: 0.76rem;">
+                                            <span class="text-primary"><i class="bi bi-gender-male"></i>{{ ch.ingresantes_m }}</span> &bull; 
+                                            <span class="text-danger"><i class="bi bi-gender-female"></i>{{ ch.ingresantes_f }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center font-monospace">
+                                    <span class="fw-bold">{{ ch.egresados }}</span>
+                                    <div class="small text-muted mt-0.5" style="font-size: 0.76rem;">
+                                        <span class="text-primary"><i class="bi bi-gender-male"></i>{{ ch.egresados_m }}</span> &bull; 
+                                        <span class="text-danger"><i class="bi bi-gender-female"></i>{{ ch.egresados_f }}</span>
+                                    </div>
+                                </td>
                                 <td class="text-center">
                                     <span class="badge-subtle {% if ch.tasa >= 30 %}badge-subtle-success{% elif ch.tasa >= 15 %}badge-subtle-info{% else %}badge-subtle-neutral{% endif %} font-monospace">
                                         {{ ch.tasa }}%
