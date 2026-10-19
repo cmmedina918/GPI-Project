@@ -2,6 +2,7 @@
 .impeccable
 .venv
 .idea
+.plugins
 *.xlsx
 *.ods
 *.md
