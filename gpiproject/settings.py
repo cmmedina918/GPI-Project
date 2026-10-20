@@ -48,11 +48,17 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'gpiproject.middlewares.customRolesPermissionMiddel.UserAccessInfoMiddleware',
+    'gpiproject.middlewares.customRolesPermissionMiddel.ControlAccesoMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'gpiproject.urls'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'analitica:dashboard'
+LOGOUT_REDIRECT_URL = 'login'
 
 TEMPLATES = [
     {
