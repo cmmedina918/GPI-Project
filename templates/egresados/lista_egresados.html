@@ -168,9 +168,13 @@
                             {% endif %}
                         </td>
                         <td class="text-end pe-4">
+                            {% if perms.egresados.change_egresado or request.es_admin_general %}
                             <a href="{% url 'egresados:editar' eg.numero_egresado %}" class="btn btn-sm btn-link text-muted p-1" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
+                            {% else %}
+                            <span class="text-muted opacity-25">&mdash;</span>
+                            {% endif %}
                         </td>
                     </tr>
                 {% empty %}

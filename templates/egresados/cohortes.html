@@ -96,12 +96,16 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm">
+                                        {% if perms.egresados.change_cohorteingresantes or request.es_admin_general %}
                                         <a href="{% url 'egresados:editar_cohorte' item.id %}" class="btn btn-outline-secondary p-1 px-2" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
+                                        {% endif %}
+                                        {% if perms.egresados.delete_cohorteingresantes or request.es_admin_general %}
                                         <a href="{% url 'egresados:eliminar_cohorte' item.id %}" class="btn btn-outline-danger p-1 px-2" title="Eliminar">
                                             <i class="bi bi-trash"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -148,6 +152,7 @@
     </div>
 
     <!-- Carga Rápida de Cohorte -->
+    {% if perms.egresados.add_cohorteingresantes or request.es_admin_general %}
     <div class="col-lg-4">
         <div class="surface-panel p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
@@ -192,5 +197,6 @@
             </form>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

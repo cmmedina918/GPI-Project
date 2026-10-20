@@ -34,6 +34,16 @@ class EgresadosAnaliticaTests(TestCase):
         self.assertEqual(tasas[0]['tasa_promedio_historica'], 10.0)
 
     def test_vistas_dashboard_y_listas(self):
+        # Usuario no autenticado debe ser redirigido al login
+        resp_dashboard_anon = self.client.get(reverse('analitica:dashboard'))
+        self.assertEqual(resp_dashboard_anon.status_code, 302)
+        self.assertIn('/login/', resp_dashboard_anon.url)
+
+        # Crear y autenticar usuario con permisos o superuser
+        from django.contrib.auth.models import User
+        user = User.objects.create_superuser('admin_test', 'test@test.com', 'pass123')
+        self.client.force_login(user)
+
         resp_dashboard = self.client.get(reverse('analitica:dashboard'))
         self.assertEqual(resp_dashboard.status_code, 200)
 

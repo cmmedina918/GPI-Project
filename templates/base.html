@@ -85,29 +85,37 @@
                     </li>
                 </ul>
 
+                {% if perms.egresados.add_egresado or perms.egresados.add_cohorteingresantes or request.es_admin_general %}
                 <div class="sidebar-section-title">Acciones Rápidas</div>
                 <ul class="sidebar-nav">
+                    {% if perms.egresados.add_egresado or request.es_admin_general %}
                     <li>
                         <a class="sidebar-link text-warning" href="{% url 'egresados:crear' %}" title="Registrar Nuevo Egresado">
                             <i class="bi bi-person-plus text-warning"></i>
                             <span class="sidebar-link-text">Nuevo Egresado</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if perms.egresados.add_cohorteingresantes or request.es_admin_general %}
                     <li>
                         <a class="sidebar-link text-info" href="{% url 'egresados:crear_cohorte' %}" title="Cargar Nueva Cohorte">
                             <i class="bi bi-cloud-plus text-info"></i>
                             <span class="sidebar-link-text">Nueva Cohorte</span>
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
+                {% endif %}
             </div>
 
             <!-- Pie del Sidebar con Control de Colapso Integrado -->
             <div class="sidebar-footer">
+                {% if user.is_staff or request.es_admin_general %}
                 <a href="{% url 'admin:index' %}" class="sidebar-link py-1 px-2" target="_blank" title="Administración Django">
                     <i class="bi bi-shield-lock"></i>
                     <span class="sidebar-link-text">Admin Django</span>
                 </a>
+                {% endif %}
                 
                 <button class="sidebar-toggle-action" id="sidebarCollapseBtn" type="button" aria-label="Colapsar menú lateral" title="Colapsar o expandir barra lateral">
                     <i class="bi bi-layout-sidebar-inset"></i>
@@ -136,11 +144,42 @@
                     </span>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    {% if perms.egresados.add_egresado or request.es_admin_general %}
                     <a href="{% url 'egresados:crear' %}" class="btn btn-institutional-primary btn-sm px-3 shadow-sm">
                         <i class="bi bi-plus-lg me-1"></i>
                         <span class="d-none d-md-inline">Nuevo Egresado</span>
                     </a>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="d-none d-md-inline fw-medium">{{ user.username }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userMenuBtn">
+                            <li class="px-3 py-1 text-muted small border-bottom mb-1">
+                                Rol: <strong>{% if request.es_admin_general %}Admin General{% elif user.groups.first %}{{ user.groups.first.name }}{% else %}Usuario{% endif %}</strong>
+                            </li>
+                            {% if user.is_staff or request.es_admin_general %}
+                            <li>
+                                <a class="dropdown-item small" href="{% url 'admin:index' %}" target="_blank">
+                                    <i class="bi bi-shield-lock me-1"></i> Administración
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item small text-danger d-flex align-items-center gap-2">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
             </header>
 

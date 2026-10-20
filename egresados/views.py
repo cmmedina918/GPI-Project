@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Q, F
 
@@ -7,7 +8,8 @@ from egresados.forms import EgresadoForm, CarreraForm, CohorteIngresantesForm
 from egresados.models import Egresado, Carrera, CohorteIngresantes
 
 
-
+@login_required
+@permission_required('egresados.view_egresado', raise_exception=True)
 def lista_egresados(request):
     query = request.GET.get('q', '').strip()
     carrera_id = request.GET.get('carrera', '')
@@ -82,6 +84,8 @@ def lista_egresados(request):
     return render(request, 'egresados/lista_egresados.html', context)
 
 
+@login_required
+@permission_required('egresados.add_egresado', raise_exception=True)
 def crear_egresado(request):
     if request.method == 'POST':
         form = EgresadoForm(request.POST)
@@ -100,6 +104,8 @@ def crear_egresado(request):
     return render(request, 'egresados/formulario_egresado.html', {'form': form, 'titulo': 'Registrar Nuevo Egresado'})
 
 
+@login_required
+@permission_required('egresados.change_egresado', raise_exception=True)
 def editar_egresado(request, numero_egresado):
     egresado = get_object_or_404(Egresado, numero_egresado=numero_egresado)
     if request.method == 'POST':
@@ -120,11 +126,15 @@ def editar_egresado(request, numero_egresado):
     })
 
 
+@login_required
+@permission_required('egresados.view_egresado', raise_exception=True)
 def detalle_egresado(request, numero_egresado):
     egresado = get_object_or_404(Egresado.objects.select_related('carrera'), numero_egresado=numero_egresado)
     return render(request, 'egresados/detalle_egresado.html', {'egresado': egresado})
 
 
+@login_required
+@permission_required('egresados.view_carrera', raise_exception=True)
 def lista_carreras(request):
     carreras = Carrera.objects.all()
     if request.method == 'POST':
@@ -143,6 +153,8 @@ def lista_carreras(request):
 # CRUD: Cohortes de Ingresantes (por Carrera, Año y Sexo)
 # ==============================================================================
 
+@login_required
+@permission_required('egresados.view_cohorteingresantes', raise_exception=True)
 def lista_cohortes(request):
     carrera_id = request.GET.get('carrera', '')
     anio = request.GET.get('anio', '')
@@ -175,6 +187,8 @@ def lista_cohortes(request):
     return render(request, 'egresados/cohortes.html', context)
 
 
+@login_required
+@permission_required('egresados.add_cohorteingresantes', raise_exception=True)
 def crear_cohorte(request):
     if request.method == 'POST':
         form = CohorteIngresantesForm(request.POST)
@@ -195,6 +209,8 @@ def crear_cohorte(request):
     })
 
 
+@login_required
+@permission_required('egresados.change_cohorteingresantes', raise_exception=True)
 def editar_cohorte(request, pk):
     cohorte = get_object_or_404(CohorteIngresantes, pk=pk)
     if request.method == 'POST':
@@ -215,6 +231,8 @@ def editar_cohorte(request, pk):
     })
 
 
+@login_required
+@permission_required('egresados.delete_cohorteingresantes', raise_exception=True)
 def eliminar_cohorte(request, pk):
     cohorte = get_object_or_404(CohorteIngresantes, pk=pk)
     if request.method == 'POST':

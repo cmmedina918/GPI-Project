@@ -1,9 +1,12 @@
 import json
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, permission_required
 from egresados.models import Carrera, Egresado
 from .services import calcular_indicadores_dashboard, calcular_tasas_graduacion_cohorte
 
 
+@login_required
+@permission_required('egresados.view_egresado', raise_exception=True)
 def dashboard(request):
     carrera_id = request.GET.get('carrera')
     sexo = request.GET.get('sexo')
@@ -68,6 +71,8 @@ def dashboard(request):
     return render(request, 'analitica/dashboard.html', context)
 
 
+@login_required
+@permission_required('egresados.view_cohorteingresantes', raise_exception=True)
 def tasas_cohorte_vista(request):
     carrera_id = request.GET.get('carrera')
     carreras = Carrera.objects.all()
