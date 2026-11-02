@@ -77,10 +77,29 @@ def tasas_cohorte_vista(request):
     carrera_id = request.GET.get('carrera')
     carreras = Carrera.objects.all()
     tasas = calcular_tasas_graduacion_cohorte(carrera_id=int(carrera_id) if carrera_id else None)
-    
+
+    # Calcular la tasa promedio histórica general (media simple de las tasas por carrera)
+    if tasas:
+        total_general = round(
+            sum(item['tasa_promedio_historica'] for item in tasas) / len(tasas), 2
+        )
+        total_general_m = round(
+            sum(item['tasa_promedio_historica_m'] for item in tasas) / len(tasas), 2
+        )
+        total_general_f = round(
+            sum(item['tasa_promedio_historica_f'] for item in tasas) / len(tasas), 2
+        )
+    else:
+        total_general = 0.0
+        total_general_m = 0.0
+        total_general_f = 0.0
+
     context = {
         'tasas': tasas,
         'carreras': carreras,
         'carrera_id': int(carrera_id) if carrera_id else None,
+        'tasa_general': total_general,
+        'tasa_general_m': total_general_m,
+        'tasa_general_f': total_general_f,
     }
     return render(request, 'analitica/tasas_cohorte.html', context)

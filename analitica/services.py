@@ -121,6 +121,7 @@ def calcular_tasas_graduacion_cohorte(carrera_id=None):
     """
     Calcula la tasa de graduación por cohorte y promedio histórico.
     TG(c, y) = (Egresados que ingresaron en 'y' / Ingresantes en 'y') * 100
+    Incluye tasas desglosadas por sexo.
     """
     carreras = Carrera.objects.all()
     if carrera_id:
@@ -132,6 +133,8 @@ def calcular_tasas_graduacion_cohorte(carrera_id=None):
         cohortes = CohorteIngresantes.objects.filter(carrera=carrera).order_by('anio_cohorte')
         datos_cohortes = []
         tasas_list = []
+        tasas_m_list = []
+        tasas_f_list = []
 
         for ch in cohortes:
             # Egresados de esta carrera que ingresaron en este año (total y por sexo)
@@ -144,30 +147,54 @@ def calcular_tasas_graduacion_cohorte(carrera_id=None):
             egresados_f = egresados_qs.filter(sexo='F').count()
 
             ingresantes = ch.cantidad_ingresantes
-            if ingresantes > 0:
+            ingresantes_m = ch.cantidad_masculino
+            ingresantes_f = ch.cantidad_femenino
+
+            # Tasa general
+            if ingresantes > 0 and egresados_cohorte > 0:
                 tasa = round((egresados_cohorte / ingresantes) * 100, 2)
                 tasas_list.append(tasa)
             else:
                 tasa = 0.0
 
+            # Tasa masculina
+            if ingresantes_m > 0 and egresados_m > 0:
+                tasa_m = round((egresados_m / ingresantes_m) * 100, 2)
+                tasas_m_list.append(tasa_m)
+            else:
+                tasa_m = 0.0
+
+            # Tasa femenina
+            if ingresantes_f > 0 and egresados_f > 0:
+                tasa_f = round((egresados_f / ingresantes_f) * 100, 2)
+                tasas_f_list.append(tasa_f)
+            else:
+                tasa_f = 0.0
+
             datos_cohortes.append({
                 'id': ch.id,
                 'anio_cohorte': ch.anio_cohorte,
                 'ingresantes': ingresantes,
-                'ingresantes_m': ch.cantidad_masculino,
-                'ingresantes_f': ch.cantidad_femenino,
+                'ingresantes_m': ingresantes_m,
+                'ingresantes_f': ingresantes_f,
                 'egresados': egresados_cohorte,
                 'egresados_m': egresados_m,
                 'egresados_f': egresados_f,
                 'tasa': tasa,
+                'tasa_m': tasa_m,
+                'tasa_f': tasa_f,
             })
 
         tasa_promedio_historica = round(sum(tasas_list) / len(tasas_list), 2) if tasas_list else 0.0
+        tasa_promedio_historica_m = round(sum(tasas_m_list) / len(tasas_m_list), 2) if tasas_m_list else 0.0
+        tasa_promedio_historica_f = round(sum(tasas_f_list) / len(tasas_f_list), 2) if tasas_f_list else 0.0
 
         resultados_carreras.append({
             'carrera': carrera,
             'cohortes': datos_cohortes,
             'tasa_promedio_historica': tasa_promedio_historica,
+            'tasa_promedio_historica_m': tasa_promedio_historica_m,
+            'tasa_promedio_historica_f': tasa_promedio_historica_f,
         })
 
     return resultados_carreras

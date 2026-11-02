@@ -44,7 +44,7 @@ class Egresado(models.Model):
     @property
     def duracion_carrera(self):
         if self.anio_egreso and self.anio_ingreso:
-            return self.anio_egreso - self.anio_ingreso
+            return self.anio_egreso - self.anio_ingreso + 1
         return None
 
     @property
